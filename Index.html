@@ -1,0 +1,1215 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Star Cinema MX — compra tus boletos de cine, elige butacas, ordena dulcería y acumula puntos Star Rewards.">
+<title>Star Cinema MX</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230053a0'/%3E%3Ccircle cx='16' cy='16' r='7' fill='%23fdbe11'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<!-- SDK de EmailJS para envío de correos optimizado -->
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<!-- Librería Html5-Qrcode para escaneo de códigos con la cámara -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js" type="text/javascript"></script>
+<script type="text/javascript">
+  (function(){
+    // Inicialización de EmailJS con tu Public Key proporcionada
+    emailjs.init("dUEyrDUMLUbD4uqyi");
+  })();
+</script>
+<style>
+  :root{
+    --blue:#0b4a86;
+    --gold:#e3a712;
+    --slate:#232f3e;
+    --bg:#ffffff;
+    --surface:#f7f8fa;
+    --surface2:#edeff2;
+    --line:#e4e7eb;
+    --text:#1c2430;
+    --muted:#6b7280;
+    --radius:12px;
+    --shadow-sm:0 1px 2px rgba(20,30,50,.05), 0 1px 1px rgba(20,30,50,.03);
+    --shadow-md:0 10px 30px -8px rgba(20,30,50,.14);
+    --shadow-lg:0 24px 60px -12px rgba(20,30,50,.22);
+    --ease:cubic-bezier(.22,.9,.3,1);
+    --ease-out:cubic-bezier(.16,1,.3,1);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;scroll-behavior:smooth;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Manrope',sans-serif;
+    -webkit-font-smoothing:antialiased;
+    min-height:100vh;
+  }
+  h1,h2,h3,.display{
+    font-family:'Bebas Neue',sans-serif;
+    letter-spacing:1px;
+    font-weight:400;
+    margin:0;
+  }
+  a{color:inherit;text-decoration:none;}
+  button{font-family:inherit;cursor:pointer;border:none;}
+  img{max-width:100%;display:block;}
+  ::selection{background:var(--gold);color:#111;}
+
+  @keyframes fadeInUp{ from{opacity:0;transform:translateY(14px);} to{opacity:1;transform:translateY(0);} }
+  @keyframes fadeIn{ from{opacity:0;} to{opacity:1;} }
+  @keyframes popIn{ from{opacity:0;transform:scale(.94);} to{opacity:1;transform:scale(1);} }
+  @keyframes kenburns{ from{transform:scale(1);} to{transform:scale(1.07);} }
+  @keyframes toastIn{ from{opacity:0;transform:translate(-50%,14px);} to{opacity:1;transform:translate(-50%,0);} }
+
+  main{animation:fadeIn .45s var(--ease-out) both;}
+  .poster-card, .snack-card, .tier-card{animation:fadeInUp .5s var(--ease-out) both; animation-delay:calc(var(--i,0) * 55ms);}
+  .overlay-inner{animation:popIn .35s var(--ease-out) both;}
+  .overlay{animation:fadeIn .25s ease both;}
+
+  @media (prefers-reduced-motion: reduce){
+    *, *::before, *::after{animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important; scroll-behavior:auto !important;}
+  }
+
+  #app{min-height:100vh;display:flex;flex-direction:column;}
+  .container{width:100%;max-width:1180px;margin:0 auto;padding:0 22px;}
+
+  .nav{
+    position:sticky;top:0;z-index:50;
+    background:rgba(255,255,255,.92);
+    border-bottom:1px solid var(--line);
+    backdrop-filter:blur(10px);
+    transition:box-shadow .25s var(--ease);
+  }
+  .nav.scrolled{box-shadow:0 1px 12px rgba(20,30,50,.06);}
+  .nav-inner{display:flex;align-items:center;justify-content:space-between;padding:14px 22px;max-width:1180px;margin:0 auto;}
+
+  .logo{display:flex;align-items:center;gap:10px;font-family:'Bebas Neue';font-size:26px;letter-spacing:2px;color:var(--slate);transition:opacity .15s ease;}
+  .logo:hover{opacity:.75;}
+  .logo .dot{width:10px;height:10px;border-radius:50%;background:var(--gold);box-shadow:0 0 8px var(--gold);}
+  .logo span{color:var(--blue);}
+  .nav-links{display:flex;gap:4px;align-items:center;}
+  .nav-btn{
+    background:transparent;color:var(--muted);padding:9px 16px;border-radius:999px;
+    font-weight:700;font-size:13px;letter-spacing:.4px;text-transform:uppercase;
+    transition:background .25s var(--ease), color .25s var(--ease), transform .15s var(--ease);
+  }
+  .nav-btn:hover{color:var(--text);}
+  .nav-btn:active{transform:scale(.95);}
+  .nav-btn.active{background:var(--blue);color:#fff;}
+  .nav-user{
+    display:flex;align-items:center;gap:8px;background:var(--surface2);
+    padding:6px 8px 6px 14px;border-radius:999px;font-size:13px;font-weight:700;
+    border:1px solid var(--line);
+  }
+  .nav-user .lvl{background:var(--gold);color:#1a1200;padding:4px 10px;border-radius:999px;font-size:11px;}
+  .icon-btn{width:30px;height:30px;border-radius:50%;background:var(--surface);display:flex;align-items:center;justify-content:center;color:var(--text);transition:background .15s ease, transform .15s var(--ease);}
+  .icon-btn:hover{background:var(--surface2);}
+  .icon-btn:active{transform:scale(.9);}
+
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    padding:13px 26px;border-radius:999px;font-weight:800;font-size:14px;
+    letter-spacing:.3px;transition:transform .18s var(--ease), box-shadow .18s var(--ease), background .18s ease, color .18s ease, border-color .18s ease;
+  }
+  .btn-gold{background:var(--gold);color:#1a1200;}
+  .btn-gold:hover{transform:translateY(-2px);box-shadow:0 10px 24px -6px rgba(227,167,18,.45);}
+  .btn-blue{background:var(--blue);color:#fff;}
+  .btn-blue:hover{transform:translateY(-2px);box-shadow:0 10px 24px -6px rgba(11,74,134,.4);}
+  .btn-outline{background:transparent;border:1.5px solid var(--line);color:var(--text);}
+  .btn-outline:hover{border-color:var(--blue);color:var(--blue);}
+  .btn:active{transform:scale(.96);}
+  .btn:disabled{opacity:.4;cursor:not-allowed;transform:none !important;box-shadow:none !important;}
+  .btn-sm{padding:8px 16px;font-size:12px;}
+  .btn-full{width:100%;}
+
+  .eyebrow{font-size:12px;letter-spacing:3px;text-transform:uppercase;color:var(--blue);font-weight:800;}
+  .muted{color:var(--muted);}
+  .section{padding:60px 0;}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow-sm);transition:box-shadow .25s var(--ease), transform .25s var(--ease);}
+  .badge{display:inline-block;padding:3px 10px;border-radius:999px;background:var(--surface2);font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--slate);border:1px solid var(--line);}
+
+  .status-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;font-size:11px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;}
+  .status-por-pagar{background:#fff3cd;color:#856404;border:1px solid #ffeeba;}
+  .status-no-pagado{background:#f8d7da;color:#721c24;border:1px solid #f5c6cb;}
+  .status-pagado{background:#d4edda;color:#155724;border:1px solid #c3e6cb;}
+
+  .hero-carousel{position:relative;height:78vh;min-height:480px;overflow:hidden;}
+  .hero-slide{
+    position:absolute;inset:0;
+    opacity:0;visibility:hidden;transition:opacity 1s var(--ease);display:flex;align-items:flex-end;overflow:hidden;
+  }
+  .hero-slide.active{opacity:1;visibility:visible;z-index:1;}
+  .hero-bg{
+    position:absolute;inset:0;background-size:cover;background-position:center;
+    animation:kenburns 9s var(--ease) both;
+  }
+  .hero-slide::before{
+    content:'';position:absolute;inset:0;z-index:1;
+    background:linear-gradient(0deg,#fff 2%, rgba(255,255,255,.6) 45%, rgba(255,255,255,.2) 100%),
+               linear-gradient(90deg, rgba(0,0,0,.75) 0%, rgba(0,0,0,.1) 60%);
+  }
+  .hero-content{position:relative;z-index:2;padding:0 22px 46px;max-width:1180px;margin:0 auto;width:100%;color:#111;animation:fadeInUp .7s var(--ease-out) both;animation-delay:.15s;}
+  .hero-title{font-size:clamp(38px,7vw,84px);line-height:.95;max-width:720px;color:var(--slate);}
+  .hero-meta{display:flex;gap:10px;margin:14px 0 16px;flex-wrap:wrap;}
+  .hero-syn{max-width:560px;color:#333;margin-bottom:22px;font-size:15px;line-height:1.55;}
+  .hero-actions{display:flex;gap:12px;flex-wrap:wrap;}
+
+  .hero-nav{
+    position:absolute;top:50%;transform:translateY(-50%);z-index:5;
+    width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,.85);
+    border:1px solid var(--line);font-size:22px;line-height:1;color:var(--slate);
+    display:flex;align-items:center;justify-content:center;transition:background .15s ease, transform .15s var(--ease);
+  }
+  .hero-nav:hover{background:#fff;}
+  .hero-nav:active{transform:translateY(-50%) scale(.9);}
+  .hero-nav.prev{left:16px;}
+  .hero-nav.next{right:16px;}
+  .hero-dots{position:absolute;bottom:18px;left:50%;transform:translateX(-50%);z-index:5;display:flex;gap:8px;}
+  .hero-dot{width:9px;height:9px;border-radius:50%;background:rgba(43,73,100,.3);border:none;padding:0;transition:.3s var(--ease);}
+  .hero-dot.active{background:var(--gold);width:24px;border-radius:5px;}
+
+  .marquee{padding:34px 0 10px;}
+  .marquee-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:22px;flex-wrap:wrap;gap:10px;}
+  .marquee-head h2{font-size:40px;color:var(--slate);}
+
+  .poster-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:24px;}
+  .poster-card{cursor:pointer;position:relative;border-radius:var(--radius);overflow:hidden;border:1px solid var(--line);background:var(--surface);transition:transform .35s var(--ease-out), box-shadow .35s var(--ease-out), border-color .35s ease;}
+  .poster-card:hover{transform:translateY(-6px);border-color:transparent;box-shadow:var(--shadow-md);}
+  .poster-card .pimg img{transition:transform .5s var(--ease-out);}
+  .poster-card:hover .pimg img{transform:scale(1.045);}
+  .poster-card .pimg{aspect-ratio:2/3;overflow:hidden;background:#dee2e6;}
+  .poster-card .pimg img{width:100%;height:100%;object-fit:cover;}
+  .poster-card .pinfo{padding:14px;}
+  .poster-card h3{font-size:20px;line-height:1.1;margin-bottom:6px;color:var(--slate);}
+  .poster-card .lang{font-size:11px;color:var(--muted);font-weight:700;letter-spacing:.5px;}
+  .play-chip{position:absolute;top:10px;right:10px;background:rgba(255,255,255,0.9);color:var(--blue);width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;border:1px solid var(--line);z-index:3;}
+
+  .detail-banner{height:300px;background-size:cover;background-position:center;position:relative;background-color:#dee2e6;}
+  .detail-banner::after{content:'';position:absolute;inset:0;background:linear-gradient(0deg,#fff 0%, rgba(255,255,255,.5) 60%, transparent 100%);}
+  .detail-body{max-width:1180px;margin:-70px auto 0;padding:0 22px 40px;position:relative;z-index:2;}
+  .detail-top{display:flex;gap:26px;align-items:flex-end;flex-wrap:wrap;margin-bottom:30px;}
+  .detail-poster{width:170px;aspect-ratio:2/3;border-radius:12px;overflow:hidden;border:3px solid #fff;box-shadow:0 10px 25px rgba(0,0,0,.15);flex-shrink:0;background:#dee2e6;}
+  .detail-poster img{width:100%;height:100%;object-fit:cover;}
+  .detail-title-block h1{font-size:44px;color:var(--slate);}
+  .detail-syn{max-width:640px;color:var(--muted);font-size:14.5px;line-height:1.6;margin-top:8px;}
+
+  .step-label{display:flex;align-items:center;gap:10px;margin:30px 0 16px;}
+  .step-label .num{width:26px;height:26px;border-radius:50%;background:var(--blue);color:#fff;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center;}
+  .step-label h3{font-family:'Manrope';font-size:15px;text-transform:uppercase;letter-spacing:1px;font-weight:800;color:var(--slate);}
+
+  .date-row,.time-row{display:flex;gap:10px;flex-wrap:wrap;}
+  .pill{
+    padding:12px 18px;border-radius:12px;background:var(--surface);border:1.5px solid var(--line);
+    font-weight:800;font-size:13px;text-align:center;min-width:64px;transition:.15s ease;cursor:pointer;color:var(--slate);
+  }
+  .pill:hover{border-color:var(--blue);}
+  .pill.selected{background:var(--blue);color:#fff;border-color:var(--blue);}
+  .pill .d2{display:block;font-size:16px;font-family:'Bebas Neue';}
+
+  .screen-wrap{text-align:center;margin:14px 0 26px;}
+  .screen{
+    width:100%;max-width:480px;height:8px;margin:0 auto 6px;border-radius:0 0 40px 40px/8px;
+    background:linear-gradient(180deg, var(--blue), transparent);
+    box-shadow:0 8px 20px -4px rgba(0,83,160,.4);
+  }
+  .screen-label{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);}
+  .seat-map{display:flex;flex-direction:column;gap:10px;align-items:center;margin:20px 0;}
+  .seat-row{display:flex;gap:10px;align-items:center;}
+  .row-tag{width:20px;font-weight:800;color:var(--slate);font-size:14px;}
+  .seat{
+    width:38px;height:34px;border-radius:8px 8px 4px 4px;background:var(--surface2);
+    border:1.5px solid var(--line);display:flex;align-items:center;justify-content:center;
+    font-size:11px;font-weight:800;color:var(--slate);transition:transform .2s var(--ease), background .2s ease, border-color .2s ease, box-shadow .2s ease;cursor:pointer;
+  }
+  .seat:hover{border-color:var(--blue);background:#fff;transform:translateY(-2px);}
+  .seat.selected{background:var(--gold);border-color:var(--gold);color:#1a1200;transform:scale(1.08);box-shadow:0 6px 14px -4px rgba(227,167,18,.5);}
+  .legend{display:flex;gap:20px;justify-content:center;flex-wrap:wrap;margin-top:16px;}
+  .legend-item{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--muted);font-weight:600;}
+  .legend-swatch{width:16px;height:14px;border-radius:4px;background:var(--surface2);border:1.5px solid var(--line);}
+  .legend-swatch.sel{background:var(--gold);border-color:var(--gold);}
+
+  .action-row{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:28px;}
+
+  .snack-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px;margin-top:20px;}
+  .snack-card{padding:20px;}
+  .snack-card h3{font-size:22px;margin-bottom:4px;color:var(--slate);}
+  .field-label{font-size:11px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);font-weight:800;margin:12px 0 6px;}
+  select, input[type=text], input[type=email], input[type=date], input[type=password], textarea{
+    width:100%;background:#fff;border:1.5px solid var(--line);color:var(--text);
+    padding:11px 13px;border-radius:10px;font-family:inherit;font-size:14px;font-weight:600;
+  }
+  select:focus, input:focus, textarea:focus{outline:2px solid var(--blue);outline-offset:1px;}
+  .chip-row{display:flex;gap:8px;flex-wrap:wrap;}
+  .chip{padding:8px 12px;border-radius:999px;background:var(--surface2);border:1.5px solid var(--line);font-size:12px;font-weight:700;color:var(--slate);}
+  .chip input{accent-color:var(--blue);}
+  .qty-row{display:flex;align-items:center;gap:12px;margin-top:14px;}
+  .qty-btn{width:32px;height:32px;border-radius:50%;background:var(--surface2);border:1.5px solid var(--line);color:var(--slate);font-size:16px;font-weight:800;cursor:pointer;}
+  .price-tag{font-family:'Bebas Neue';font-size:22px;color:var(--blue);}
+
+  .order-panel{position:sticky;top:90px;}
+  .order-item{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;padding:12px 0;border-bottom:1px dashed var(--line);font-size:13px;}
+  .order-item:last-child{border-bottom:none;}
+  .order-item .oi-name{font-weight:700;color:var(--slate);}
+  .order-item .oi-sub{color:var(--muted);font-size:11.5px;margin-top:2px;}
+  .order-total-row{display:flex;justify-content:space-between;padding-top:14px;margin-top:8px;border-top:2px solid var(--line);font-family:'Bebas Neue';font-size:24px;color:var(--slate);}
+  .rm-btn{background:transparent;color:#dc3545;font-size:11px;font-weight:800;cursor:pointer;padding:0;}
+
+  .ticket{
+    background:var(--surface);border:1px solid var(--line);border-radius:16px;position:relative;overflow:hidden;
+    box-shadow:var(--shadow-md);
+  }
+  .ticket-pop{animation:popIn .5s var(--ease-out) both;}
+  .ticket-divider{position:relative;margin:18px -26px;border-top:2px dashed var(--line);}
+  .ticket-divider::before, .ticket-divider::after{
+    content:'';position:absolute;top:50%;transform:translateY(-50%);
+    width:24px;height:24px;border-radius:50%;background:#fff;
+  }
+  .ticket-divider::before{left:-12px;}
+  .ticket-divider::after{right:-12px;}
+
+  .pago-grid{display:grid;grid-template-columns:1.3fr 1fr;gap:26px;align-items:start;}
+  .pago-card{padding:26px;}
+  .pay-method{display:flex;gap:12px;margin-top:8px;flex-wrap:wrap;}
+  .pay-opt{flex:1;min-width:140px;padding:16px;border-radius:12px;border:1.5px solid var(--line);background:var(--surface2);text-align:center;font-weight:800;font-size:13px;cursor:pointer;color:var(--slate);transition:border-color .2s ease, background .2s ease, transform .15s var(--ease);}
+  .pay-opt:not(.disabled):hover{border-color:var(--blue);transform:translateY(-1px);}
+  .pay-opt.selected{border-color:var(--blue);background:rgba(0,83,160,.08);color:var(--blue);}
+  .pay-opt.disabled{opacity:.4;cursor:not-allowed;}
+  .tab-row{display:flex;gap:10px;margin-bottom:20px;}
+  .tab-btn{flex:1;padding:12px;border-radius:10px;background:var(--surface2);border:1.5px solid var(--line);font-weight:800;font-size:13px;cursor:pointer;color:var(--slate);transition:background .2s ease, color .2s ease, border-color .2s ease;}
+  .tab-btn.active{background:var(--blue);border-color:var(--blue);color:#fff;}
+
+  .qr{width:150px;height:150px;margin:0 auto;border-radius:10px;background:#fff;padding:8px;border:1px solid var(--line);}
+
+  .pronto-card{display:grid;grid-template-columns:220px 1fr;gap:26px;padding:24px;align-items:center;}
+  @media(max-width:640px){.pronto-card{grid-template-columns:1fr;}}
+
+  .tier-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px;margin-top:24px;}
+  .tier-card{padding:22px;border-top:4px solid var(--slate);cursor:pointer;transition:transform .25s var(--ease), box-shadow .25s var(--ease);}
+  .tier-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-md);}
+  .tier-card.star{border-top-color:#adb5bd;}
+  .tier-card.planet{border-top-color:var(--blue);}
+  .tier-card.galaxy{border-top-color:var(--gold);}
+  .tier-card h3{font-size:26px;margin-bottom:4px;color:var(--slate);}
+  .tier-card ul{padding-left:18px;margin:12px 0 0;font-size:13px;color:var(--muted);line-height:1.9;}
+
+  .member-card{
+    max-width:420px;border-radius:18px;padding:26px;position:relative;overflow:hidden;
+    background:linear-gradient(135deg, var(--slate), #18283b);
+    border:1px solid var(--line); color:#fff;
+  }
+  .member-card .lvltag{font-family:'Bebas Neue';font-size:26px;color:var(--gold);letter-spacing:2px;}
+  .member-card .cname{font-size:20px;font-weight:800;margin-top:16px;}
+  .member-card .cmeta{color:#adb5bd;font-size:12px;margin-top:4px;}
+  .member-card .pts{font-family:'Bebas Neue';font-size:46px;margin-top:14px;color:#fff;}
+
+  footer{margin-top:auto;border-top:1px solid var(--line);background:var(--surface);padding:50px 0 26px;}
+
+  .toast{
+    position:fixed;bottom:26px;left:50%;background:var(--slate);
+    border:1px solid var(--gold);color:#fff;padding:14px 22px;border-radius:12px;font-weight:700;font-size:13px;
+    z-index:200;box-shadow:var(--shadow-lg);display:flex;align-items:center;gap:10px;
+    animation:toastIn .4s var(--ease-out) both;transition:opacity .3s ease, transform .3s var(--ease);
+  }
+  .toast.toast-out{opacity:0;transform:translate(-50%,10px);}
+
+  .seat.taken{background:#e9ecef;color:#adb5bd;border-style:dashed;cursor:not-allowed;}
+  .seat.taken:hover{border-color:var(--line);background:#e9ecef;transform:none;}
+  .legend-swatch.taken{background:#e9ecef;border-style:dashed;}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="toast-zone"></div>
+
+<script>
+const MOVIES = [
+  {
+    id:'backrooms',
+    title:'Backrooms: Sin Salida',
+    synopsis:'La película Backrooms trata sobre espacios liminales, dimensions paralelas y traumas ocultos. Sigue a Clark, el dueño de una tienda de muebles, y a su terapeuta Mary, luego de que descubren un laberinto infinito de habitaciones amarillas tras una puerta secreta en el sótano.',
+    lang:'Español / Inglés',
+    poster:'https://palomaynacho.com/wp-content/uploads/2026/05/Backrooms-poster-pelicula.jpg',
+    banner:'https://images4.alphacoders.com/140/thumb-1920-1407763.webp',
+    trailer:'https://www.youtube.com/watch?v=j6xBUJSm_S8',
+    showtimes:[
+      {date:'03 AGO 26', iso:'2026-08-03', times:['11:20AM','12:45PM','7:55PM','09:20PM']},
+      {date:'04 AGO 26', iso:'2026-08-04', times:['10:00AM','3:25PM','04:40PM']}
+    ]
+  },
+  {
+    id:'toystory5',
+    title:'Toy Story 5',
+    synopsis:'Los juguetes tradicionales enfrentan su mayor desafío frente a la tecnología moderna, cuando Bonnie se distrae con una tablet. Woody regresa para ayudar a la pandilla en una aventura sobre el uso de pantallas.',
+    lang:'Español',
+    poster:'https://image.tmdb.org/t/p/original/iJUV9QS4L9wS7WTV7ICV1TWUB1X.jpg',
+    banner:'https://images8.alphacoders.com/140/thumb-1920-1403646.jpg',
+    trailer:'https://www.youtube.com/watch?v=s_qpMMkvHYE',
+    showtimes:[
+      {date:'03 AGO 26', iso:'2026-08-03', times:['11:20AM','12:45PM','7:55PM','09:20PM']},
+      {date:'04 AGO 26', iso:'2026-08-04', times:['10:00AM','3:25PM','04:40PM']}
+    ]
+  },
+  {
+    id:'diadelarevelacion',
+    title:'El día de la revelación',
+    synopsis:'El día de la revelación trata sobre un futuro cercano en el que la humanidad está a punto de conocer la prueba definitiva de la existencia de vida extraterrestre. La historia sigue a una meteoróloga que empieza a hablar en idiomas extraños y a un hombre con pruebas secretas del gobierno mientras escapan de las autoridades para revelar la verdad al mundo.',
+    lang:'Español / Inglés',
+    poster:'https://es.web.img2.acsta.net/c_310_420/img/4c/76/4c76c87d9cf346dfc2af1fcaa76f964a.jpg',
+    banner:'https://www.cinent.com/images/El_dia_de_la_revelacion_01.jpg',
+    trailer:'https://youtu.be/IBmUJCePEF4?si=RemCna12SoM-_rUm',
+    showtimes:[
+      {date:'03 AGO 26', iso:'2026-08-03', times:['10:30AM','12:45PM','3:25PM','07:50PM']},
+      {date:'04 AGO 26', iso:'2026-08-04', times:['12:20PM','5:25PM','08:30PM']}
+    ]
+  },
+  {
+    id:'obsesion',
+    title:'Obsesión',
+    synopsis:'Cuenta la historia de Bear, un joven empleado de una tienda de música enamorado en secreto de su mejor amiga Nikki. Desesperado por su amor, usa un amuleto sobrenatural para hacer que ella se enamore de él, lo que desata una pesadilla de control y una obsesión violenta.',
+    lang:'Español / Inglés',
+    poster:'https://m.media-amazon.com/images/M/MV5BMmQ3ODQxNjAtZmRlMS00NmNjLTliZmYtY2M3ZWQzMDIwMmNiXkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg',
+    banner:'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSTPmT0ZuvHsaD4HaAkmohPngB0k49M9dta3xZL0FyWVnU3OTycJJGH90c&s=10',
+    trailer:'https://www.youtube.com/watch?v=KjoR2pVaEvY',
+    showtimes:[
+      {date:'03 AGO 26', iso:'2026-08-03', times:['10:30AM','12:45PM','3:25PM','07:50PM']},
+      {date:'04 AGO 26', iso:'2026-08-04', times:['12:20PM','5:25PM','08:30PM']}
+    ]
+  },
+  {
+    id:'supergirl',
+    title:'Supergirl',
+    synopsis:"Tomando como referencia la reciente miniserie escrita por Tom King, esta película promete una visión diferente de lo que la mayoría piensa cuando le viene a la mente la prima de Superman.",
+    lang:'Español / Inglés',
+    poster:'https://image.tmdb.org/t/p/original/xhei2GX9L2H1eQlrHeFw44VNLd1.jpg',
+    banner:'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS4_LQtGdrs4pzl-Lk7gQSJkVsz0ntj7lE2rbDBiUq2a0JTiH3_lghTuAA-&s=10',
+    trailer:'https://www.youtube.com/watch?v=7yr4TcUYLTA',
+    showtimes:[
+      {date:'03 AGO 26', iso:'2026-08-03', times:['10:30AM','12:45PM','3:25PM','07:50PM']},
+      {date:'04 AGO 26', iso:'2026-08-04', times:['12:20PM','5:25PM','08:30PM']}
+    ]
+  }
+];
+
+const PRONTO_MOVIE = {
+  id:'lainvitacion',
+  title:'La invitación',
+  synopsis:'La invitación es una comedia estadounidense dirigida por Olivia Wilde. Es una adaptación en inglés de la película española Sentimental.',
+  lang:'Español / Inglés',
+  poster:'https://pics.filmaffinity.com/La_invitaciaon-412199916-large.jpg',
+  banner:'https://es.rollingstone.com/wp-content/uploads/2026/07/Critica-La-invitacion-The-Invite-1.jpg',
+  trailer:'https://www.youtube.com/watch?v=G7Bo0yV2Xvw'
+};
+
+const SEAT_ROWS = [
+  {row:'A', count:5},
+  {row:'B', count:5},
+  {row:'C', count:5},
+  {row:'D', count:4}
+];
+
+const SNACKS = {
+  bebidas:{label:'Bebidas', flavors:['Coca-Cola','Sprite','Fanta','Fuze tea','Jumex piña','Jumex mango'], sizes:{Chico:25,Mediano:30,Grande:35}},
+  palomitas:{label:'Palomitas', flavors:['Naturales','Mantequilla','Fitness'], sizes:{Chica:30,Mediana:35,Grande:40}},
+  nachos:{label:'Nachos', flavors:['Normales','Extra queso'], sizes:{Mediana:35,Grande:45}},
+  hotstar:{label:'Hot Star', toppings:['Cebolla','Tomate','Chiles','Mayonesa'], price:30}
+};
+
+const TIER_DEFS = [
+  {key:'Star', min:1, max:12, divisor:20, perks:['Descuento en dia de tu cumpleanos','Puntos Star Rewards','Descuentos los Lunes','Dinámicas exclusivas']},
+  {key:'Planet', min:12, max:20, divisor:15, perks:['Descuento en tu mes de cumpleanos','Puntos Star Rewards','Descuentos de Lunes a Viernes','Dinámicas exclusivas','Pagos flexibles']},
+  {key:'Galaxy', min:20, max:30, divisor:10, perks:['Descuento en tu mes de cumpleanos','Puntos Star Rewards','Descuentos toda la semana','Dinámicas exclusivas','Eventos exclusivos','Fast pass']}
+];
+
+let S = {
+  view:'cartelera',
+  activeMovie:null,
+  selectedDate:null,
+  selectedTime:null,
+  selectedSeats:[],
+  snackCart:[],
+  lastTicket:null,
+  guestPurchases:[],
+  takenSeats:{},
+  accounts:{
+    'starcinemamx@gmail.com': {
+      name: 'Personal Star Cinema',
+      email: 'starcinemamx@gmail.com',
+      phone: '5500000000',
+      birthdate: '2026-01-01',
+      gender: 'Personal',
+      accountNo: 'STAFF01SC',
+      purchases: [],
+      points: 999,
+      isStaff: true
+    }
+  },
+  currentUserEmail:null,
+  authTab:'login',
+  payMethod:'taquilla',
+  loginMode:false,
+  expandedTicketCode:null,
+  expandedTierModal:null,
+  scannerActive:false,
+  scanResult:null,
+  heroIndex:0
+};
+
+const $app = document.getElementById('app');
+
+function money(n){ return '$' + n.toFixed(0); }
+
+function esc(str){
+  return String(str ?? '').replace(/[&<>"']/g, ch => ({
+    '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;'
+  }[ch]));
+}
+
+const IMG_FALLBACK = 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 300 450\'%3E%3Crect width=\'300\' height=\'450\' fill=\'%23e9ecef\'/%3E%3Ctext x=\'50%25\' y=\'50%25\' font-family=\'sans-serif\' font-size=\'20\' fill=\'%236c757d\' text-anchor=\'middle\' dy=\'.3em\'%3EImagen no disponible%3C/text%3E%3C/svg%3E';
+function onImgErr(el){ el.onerror=null; el.src = IMG_FALLBACK; }
+
+function currentUser(){ return S.currentUserEmail ? S.accounts[S.currentUserEmail] : null; }
+
+function tierInfo(count){
+  let t = TIER_DEFS[0];
+  for(const td of TIER_DEFS){ if(count>=td.min) t=td; }
+  return t;
+}
+
+function toast(msg){
+  const zone = document.getElementById('toast-zone');
+  const el = document.createElement('div');
+  el.className='toast';
+  el.innerHTML = '✅ '+msg;
+  zone.appendChild(el);
+  setTimeout(()=>{
+    el.classList.add('toast-out');
+    setTimeout(()=>el.remove(), 320);
+  }, 3200);
+}
+
+function snackCartTotal(){ return S.snackCart.reduce((a,i)=>a+i.price*i.qty,0); }
+function ticketsTotal(){ return S.selectedSeats.length ? S.selectedSeats.length*120 : 0; }
+function orderTotal(){ return snackCartTotal() + ticketsTotal(); }
+
+function renderNav(){
+  const u = currentUser();
+  return `
+  <div class="nav">
+    <div class="nav-inner">
+      <div class="logo" onclick="goCartelera()" style="cursor:pointer">
+        <span class="dot"></span> STAR <span>CINEMA</span> MX
+      </div>
+      <div class="nav-links">
+        <button class="nav-btn ${S.view==='cartelera'||S.view==='detalle'?'active':''}" onclick="goCartelera()">Cartelera</button>
+        <button class="nav-btn ${S.view==='pronto'?'active':''}" onclick="goPronto()">Pronto</button>
+        <button class="nav-btn ${S.view==='dulceria'?'active':''}" onclick="goDulceriaFromMenu()">Dulcería</button>
+        <button class="nav-btn ${S.view==='rewards'?'active':''}" onclick="goRewards()">Rewards</button>
+      </div>
+      <div>
+        ${u ? `
+          <div class="nav-user">
+            <span class="lvl">${u.isStaff ? 'STAFF' : tierInfo(u.purchases.length).key}</span>
+            <span>${u.name.split(' ')[0]}</span>
+            <button class="icon-btn" title="Cerrar sesión" onclick="logoutUser()">⏻</button>
+          </div>
+        ` : `<button class="btn btn-outline btn-sm" onclick="goRewards()">Iniciar sesión</button>`}
+      </div>
+    </div>
+  </div>`;
+}
+
+function goCartelera(){ S.view='cartelera'; render(); window.scrollTo(0,0); }
+
+function renderCartelera(){
+  const idx = ((S.heroIndex % MOVIES.length) + MOVIES.length) % MOVIES.length;
+  return `
+  <div class="hero-carousel">
+    ${MOVIES.map((hero,i)=>`
+      <div class="hero-slide ${i===idx?'active':''}">
+        <div class="hero-bg" style="background-image:url('${hero.banner}')"></div>
+        <div class="hero-content">
+          <div class="eyebrow">Estrenos destacados</div>
+          <h1 class="hero-title">${hero.title}</h1>
+          <div class="hero-meta"><span class="badge">${hero.lang}</span></div>
+          <p class="hero-syn">${hero.synopsis}</p>
+          <div class="hero-actions">
+            <button class="btn btn-gold" onclick="selectMovie('${hero.id}')">🎟 Comprar boletos</button>
+            <a class="btn btn-outline" href="${hero.trailer}" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">▶ Ver tráiler</a>
+          </div>
+        </div>
+      </div>
+    `).join('')}
+    <button class="hero-nav prev" onclick="heroPrev()">‹</button>
+    <button class="hero-nav next" onclick="heroNext()">›</button>
+  </div>
+
+  <div class="container marquee">
+    <div class="marquee-head">
+      <h2>Cartelera Actual</h2>
+      <span class="muted" style="font-size:13px;">Haz clic en el póster de una película para ver funciones y horarios</span>
+    </div>
+    <div class="poster-row">
+      ${MOVIES.map((m,i)=>`
+        <div class="poster-card" style="--i:${i}" onclick="selectMovie('${m.id}')">
+          <a class="play-chip" href="${m.trailer}" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">🎬</a>
+          <div class="pimg"><img src="${m.poster}" alt="${m.title}" loading="lazy" onerror="onImgErr(this)"></div>
+          <div class="pinfo">
+            <h3>${m.title}</h3>
+            <div class="lang">${m.lang}</div>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+  </div>`;
+}
+
+function heroGoTo(i){ S.heroIndex = ((i % MOVIES.length) + MOVIES.length) % MOVIES.length; render(); }
+function heroNext(){ heroGoTo(S.heroIndex+1); }
+function heroPrev(){ heroGoTo(S.heroIndex-1); }
+
+function selectMovie(id){
+  S.activeMovie = MOVIES.find(m=>m.id===id);
+  S.selectedDate = null; S.selectedTime = null; S.selectedSeats = [];
+  S.view='detalle';
+  render(); window.scrollTo(0,0);
+}
+
+function selectDate(iso){ S.selectedDate = iso; S.selectedTime=null; S.selectedSeats=[]; render(); }
+function selectTime(t){ S.selectedTime = t; S.selectedSeats=[]; render(); }
+
+function showKey(movie, iso, time){ return movie.id+'|'+iso+'|'+time; }
+function takenSeatsForCurrentShow(){
+  if(!S.activeMovie || !S.selectedDate || !S.selectedTime) return [];
+  return S.takenSeats[showKey(S.activeMovie, S.selectedDate, S.selectedTime)] || [];
+}
+
+function toggleSeat(id){
+  if(takenSeatsForCurrentShow().includes(id)) return;
+  const idx = S.selectedSeats.indexOf(id);
+  if(idx>-1) S.selectedSeats.splice(idx,1); else S.selectedSeats.push(id);
+  render();
+}
+
+function renderDetalle(){
+  const m = S.activeMovie;
+  const showObj = m.showtimes.find(s=>s.iso===S.selectedDate);
+  return `
+  <div class="detail-banner" style="background-image:url('${m.banner}')"></div>
+  <div class="detail-body">
+    <div class="detail-top">
+      <div class="detail-poster"><img src="${m.poster}" alt="${m.title}" onerror="onImgErr(this)"></div>
+      <div class="detail-title-block">
+        <span class="badge">${m.lang}</span>
+        <h1>${m.title}</h1>
+        <p class="detail-syn">${m.synopsis}</p>
+        <a class="btn btn-outline btn-sm" style="margin-top:10px;display:inline-flex;" href="${m.trailer}" target="_blank" rel="noopener noreferrer">▶ Ver tráiler</a>
+      </div>
+    </div>
+
+    <div class="step-label"><span class="num">1</span><h3>Selecciona la fecha</h3></div>
+    <div class="date-row">
+      ${m.showtimes.map(st=>`
+        <div class="pill ${S.selectedDate===st.iso?'selected':''}" onclick="selectDate('${st.iso}')">
+          <span class="d2">${st.date}</span>
+        </div>`).join('')}
+    </div>
+
+    ${S.selectedDate ? `
+    <div class="step-label"><span class="num">2</span><h3>Selecciona el horario</h3></div>
+    <div class="time-row">
+      ${showObj.times.map(t=>`<div class="pill ${S.selectedTime===t?'selected':''}" onclick="selectTime('${t}')"><span class="d2">${t}</span></div>`).join('')}
+    </div>` : ''}
+
+    ${S.selectedTime ? `
+    <div class="step-label"><span class="num">3</span><h3>Selecciona tus butacas</h3></div>
+    <div class="screen-wrap">
+      <div class="screen"></div>
+      <div class="screen-label">Pantalla</div>
+    </div>
+    <div class="seat-map">
+      ${SEAT_ROWS.map(r=>`
+        <div class="seat-row">
+          <div class="row-tag">${r.row}</div>
+          ${Array.from({length:r.count},(_,i)=>{
+            const id = r.row+(i+1);
+            const sel = S.selectedSeats.includes(id);
+            const taken = takenSeatsForCurrentShow().includes(id);
+            return `<div class="seat ${sel?'selected':''}${taken?'taken':''}" onclick="toggleSeat('${id}')">${id}</div>`;
+          }).join('')}
+        </div>
+      `).join('')}
+    </div>
+    <div class="legend">
+      <div class="legend-item"><span class="legend-swatch"></span> Disponible</div>
+      <div class="legend-item"><span class="legend-swatch sel"></span> Seleccionado</div>
+      <div class="legend-item"><span class="legend-swatch taken"></span> Ocupado</div>
+    </div>
+
+    <div class="action-row">
+      <button class="btn btn-outline" onclick="goDulceriaFromMovie()">Dulcería</button>
+      <button class="btn btn-gold" onclick="goToPago()">Finalizar orden →</button>
+    </div>` : ''}
+  </div>`;
+}
+
+function goDulceriaFromMovie(){ S.view='dulceria'; render(); window.scrollTo(0,0); }
+function goDulceriaFromMenu(){ S.view='dulceria'; render(); window.scrollTo(0,0); }
+
+function addSimpleSnack(cat){
+  const cfg = SNACKS[cat];
+  const flavor = document.getElementById('flavor-'+cat).value;
+  const size = document.getElementById('size-'+cat).value;
+  const qty = parseInt(document.getElementById('qty-'+cat).value||'1',10);
+  const price = cfg.sizes[size];
+  S.snackCart.push({ id: Date.now()+Math.random(), label: `${cfg.label} (${flavor})`, detail: `Tamaño ${size}`, price, qty });
+  toast(`${cfg.label} agregado a tu orden`);
+  render();
+}
+
+function addHotstar(){
+  const boxes = SNACKS.hotstar.toppings.filter(t=>document.getElementById('top-'+t).checked);
+  const qty = parseInt(document.getElementById('qty-hotstar').value||'1',10);
+  S.snackCart.push({ id: Date.now()+Math.random(), label:'Hot Star', detail: boxes.length ? 'Con: '+boxes.join(', ') : 'Normal', price: SNACKS.hotstar.price, qty });
+  toast('Hot Star agregado a tu orden');
+  render();
+}
+
+function removeSnack(id){ S.snackCart = S.snackCart.filter(i=>i.id!==id); render(); }
+function resetOrder(){
+  S.activeMovie=null; S.selectedDate=null; S.selectedTime=null; S.selectedSeats=[]; S.snackCart=[];
+  S.view='cartelera'; render(); window.scrollTo(0,0);
+  toast('Orden reiniciada');
+}
+
+function qtyStepper(id){
+  return `
+  <div class="qty-row">
+    <button type="button" class="qty-btn" onclick="stepQty('${id}',-1)">−</button>
+    <input type="text" id="${id}" value="1" readonly style="width:40px;text-align:center;border:none;background:transparent;font-weight:800;">
+    <button type="button" class="qty-btn" onclick="stepQty('${id}',1)">+</button>
+  </div>`;
+}
+function stepQty(id, delta){
+  const el = document.getElementById(id);
+  let v = parseInt(el.value,10) + delta;
+  if(v<1) v=1;
+  el.value = v;
+}
+
+function renderSnackCard(catKey, idx=0){
+  const cfg = SNACKS[catKey];
+  if(catKey==='hotstar'){
+    return `
+    <div class="card snack-card" style="--i:${idx}">
+      <h3>Hot Star</h3>
+      <p class="muted" style="font-size:12px;">Elige los ingredientes de tu hot dog</p>
+      <div class="field-label">Ingredientes</div>
+      <div class="chip-row">
+        ${cfg.toppings.map(t=>`<label class="chip" style="cursor:pointer;"><input type="checkbox" id="top-${t}" style="margin-right:4px;">${t}</label>`).join('')}
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:14px;">
+        ${qtyStepper('qty-hotstar')}
+        <span class="price-tag">${money(cfg.price)}</span>
+      </div>
+      <button class="btn btn-blue btn-full" style="margin-top:14px;" onclick="addHotstar()">Agregar</button>
+    </div>`;
+  }
+  const sizeKeys = Object.keys(cfg.sizes);
+  return `
+  <div class="card snack-card" style="--i:${idx}">
+    <h3>${cfg.label}</h3>
+    <div class="field-label">Variedad</div>
+    <select id="flavor-${catKey}">${cfg.flavors.map(f=>`<option value="${f}">${f}</option>`).join('')}</select>
+    <div class="field-label">Tamaño y Precio</div>
+    <select id="size-${catKey}" onchange="render()">${sizeKeys.map(s=>`<option value="${s}">${s} —${money(cfg.sizes[s])}</option>`).join('')}</select>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:14px;">
+      ${qtyStepper('qty-'+catKey)}
+    </div>
+    <button class="btn btn-blue btn-full" style="margin-top:14px;" onclick="addSimpleSnack('${catKey}')">Agregar</button>
+  </div>`;
+}
+
+function renderOrderSummary(showCheckout){
+  const items = [];
+  if(S.activeMovie && S.selectedDate && S.selectedTime && S.selectedSeats.length){
+    items.push({ name: S.activeMovie.title, sub: `${S.selectedDate} · ${S.selectedTime} · Butacas: ${S.selectedSeats.join(', ')}`, price: S.selectedSeats.length*120 });
+  }
+  return `
+  <div class="card order-panel" style="padding:22px;">
+    <h3 style="font-size:20px;margin-bottom:14px;">Resumen de tu orden</h3>
+    ${items.map(i=>`<div class="order-item"><div><div class="oi-name">${i.name}</div><div class="oi-sub">${i.sub}</div></div><div style="font-weight:800;">${money(i.price)}</div></div>`).join('')}
+    ${S.snackCart.map(i=>`<div class="order-item"><div><div class="oi-name">${i.label} ×${i.qty}</div><div class="oi-sub">${i.detail}</div></div><div style="text-align:right;"><div style="font-weight:800;">${money(i.price*i.qty)}</div><button class="rm-btn" onclick="removeSnack(${i.id})">Quitar</button></div></div>`).join('')}
+    ${(!items.length && !S.snackCart.length) ? `<p class="muted" style="font-size:13px;padding:14px 0;">Tu orden está vacía.</p>` : ''}
+    <div class="order-total-row"><span>Total</span><span>${money(orderTotal())}</span></div>
+    <div style="display:flex;flex-direction:column;gap:10px;margin-top:18px;">
+      ${showCheckout ? `<button class="btn btn-gold btn-full" onclick="goToPago()">Pagar →</button>` : ''}
+      <button class="btn btn-outline btn-full" onclick="resetOrder()">Reiniciar orden</button>
+    </div>
+  </div>`;
+}
+
+function renderDulceria(){
+  return `
+  <div class="container section">
+    <div class="eyebrow">Dulcería</div>
+    <h2 style="font-size:38px;margin-bottom:6px;">Alimentos y Bebidas</h2>
+    <div style="display:grid;grid-template-columns:2fr 1fr;gap:26px;align-items:start;margin-top:20px;">
+      <div class="snack-grid">
+        ${renderSnackCard('bebidas',0)}
+        ${renderSnackCard('palomitas',1)}
+        ${renderSnackCard('nachos',2)}
+        ${renderSnackCard('hotstar',3)}
+      </div>
+      ${renderOrderSummary(true)}
+    </div>
+  </div>`;
+}
+
+function goToPago(){ _placingOrder=false; S.view='pago'; S.loginMode=false; render(); window.scrollTo(0,0); }
+function setPayMethod(m){ S.payMethod=m; render(); }
+function togglePagoAuth(mode){ S.loginMode = mode==='login'; render(); }
+
+let _placingOrder = false;
+function placeOrder(){
+  if(_placingOrder) return;
+  let name, email;
+  const u = currentUser();
+  if(u){ name = u.name; email = u.email; } 
+  else {
+    name = document.getElementById('guest-name')?.value.trim();
+    email = document.getElementById('guest-email')?.value.trim();
+    if(!name || !email){ toast('⚠️ Ingresa tu nombre y correo electrónico'); return; }
+    if(!isValidEmail(email)){ toast('⚠️ Ingresa un correo electrónico válido'); return; }
+  }
+  _placingOrder = true;
+
+  const items = [];
+  if(S.activeMovie && S.selectedDate && S.selectedTime && S.selectedSeats.length){
+    items.push(`${S.activeMovie.title} — ${S.selectedDate}, ${S.selectedTime}, Butacas: ${S.selectedSeats.join(', ')}`);
+    const key = showKey(S.activeMovie, S.selectedDate, S.selectedTime);
+    S.takenSeats[key] = (S.takenSeats[key] || []).concat(S.selectedSeats);
+  }
+  S.snackCart.forEach(i=> items.push(`${esc(i.label)} ×${i.qty} (${esc(i.detail)})`));
+
+  const total = orderTotal();
+  const code = 'SC-'+Math.random().toString(36).slice(2,8).toUpperCase();
+  const ticket = { code, name, email, items, total, date: new Date().toLocaleString('es-MX'), payMethod: S.payMethod, movie: S.activeMovie, status: 'por pagar' };
+  S.lastTicket = ticket;
+
+  if(u && !u.isStaff){
+    u.purchases.push(ticket);
+    const t = tierInfo(u.purchases.length);
+    u.points += Math.floor(total / t.divisor);
+  } else {
+    S.guestPurchases.push(ticket);
+  }
+
+  // ENVÍO DE CORREO USANDO TUS CREDENCIALES CONFIGURADAS DE EMAILJS
+  const templateParams = {
+    name: name,
+    email: email,
+    order_id: code,
+    name_pelicula: S.activeMovie ? S.activeMovie.title : 'Artículos de Dulcería / Varios',
+    funcion_horario: S.activeMovie && S.selectedDate && S.selectedTime ? `${S.selectedDate} - ${S.selectedTime}` : 'N/A',
+    asientos: S.selectedSeats.length ? S.selectedSeats.join(', ') : 'N/A',
+    poster_url: S.activeMovie ? S.activeMovie.poster : 'https://image.tmdb.org/t/p/original/iJUV9QS4L9wS7WTV7ICV1TWUB1X.jpg',
+    units: S.selectedSeats.length ? S.selectedSeats.length : '1',
+    price: total.toFixed(2)
+  };
+
+  emailjs.send("service_jk76uvi$", "template_eisldou", templateParams)
+    .then(function(response) {
+       console.log('SUCCESS!', response.status, response.text);
+       toast('Correo enviado con éxito. Boleto disponible en Rewards.');
+    }, function(error) {
+       console.log('FAILED...', error);
+       toast('⚠️ Error al enviar el correo automático, pero tu orden ha sido registrada.');
+    });
+
+  S.activeMovie=null; S.selectedDate=null; S.selectedTime=null; S.selectedSeats=[]; S.snackCart=[];
+  S.view='ticket';
+  render(); window.scrollTo(0,0);
+}
+
+function renderPago(){
+  const u = currentUser();
+  return `
+  <div class="container section">
+    <div class="eyebrow">Checkout</div>
+    <h2 style="font-size:38px;margin-bottom:20px;">Método de Pago</h2>
+    <div class="pago-grid">
+      <div class="card pago-card">
+        ${!u ? `
+        <div class="tab-row">
+          <button class="tab-btn ${S.loginMode?'active':''}" onclick="togglePagoAuth('login')">Iniciar sesión</button>
+          <button class="tab-btn ${!S.loginMode?'active':''}" onclick="togglePagoAuth('guest')">Continuar como invitado</button>
+        </div>` : ''}
+
+        ${u ? `
+          <p style="font-weight:700;">Comprando como <span style="color:var(--blue);">${esc(u.name)}</span> (${esc(u.email)})</p>
+        ` : S.loginMode ? `
+          <div class="field-label">Correo electrónico</div>
+          <input type="email" id="login-email-pago" placeholder="tucorreo@ejemplo.com">
+          <div class="field-label">Contraseña</div>
+          <input type="password" id="login-pass-pago" placeholder="••••••••">
+          <button class="btn btn-blue btn-full" style="margin-top:16px;" onclick="loginFromPago()">Iniciar sesión</button>
+        ` : `
+          <div class="field-label">Nombre completo</div>
+          <input type="text" id="guest-name" placeholder="Tu nombre">
+          <div class="field-label">Correo electrónico</div>
+          <input type="email" id="guest-email" placeholder="tucorreo@ejemplo.com">
+        `}
+
+        <div class="field-label">Método de pago</div>
+        <div class="pay-method">
+          <div class="pay-opt ${S.payMethod==='taquilla'?'selected':''}" onclick="setPayMethod('taquilla')">🏧 Pagar en taquilla</div>
+          <div class="pay-opt disabled">💳 Con tarjeta</div>
+        </div>
+
+        <button class="btn btn-gold btn-full" style="margin-top:26px;" onclick="placeOrder()">Finalizar orden</button>
+      </div>
+      ${renderOrderSummary(false)}
+    </div>
+  </div>`;
+}
+
+function loginFromPago(){
+  const email = document.getElementById('login-email-pago').value.trim().toLowerCase();
+  const pass = document.getElementById('login-pass-pago').value;
+  const acc = S.accounts[email];
+  if(acc && !acc.isStaff && acc.password === pass){ S.currentUserEmail = email; toast('Sesión iniciada'); render(); }
+  else toast('⚠️ Cuenta o contraseña incorrecta.');
+}
+
+function getStatusBadge(status){
+  if(status === 'pagado') return `<span class="status-badge status-pagado">🟢 Pagado</span>`;
+  if(status === 'no pagado') return `<span class="status-badge status-no-pagado">🔴 No pagado</span>`;
+  return `<span class="status-badge status-por-pagar">🟡 Por pagar</span>`;
+}
+
+function renderTicket(){
+  const t = S.lastTicket;
+  if(!t) return `<div class="container section"><p>No hay boleto disponible.</p></div>`;
+  const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(t.code)}`;
+  return `
+  <div class="container section" style="max-width:640px;">
+    <div style="text-align:center;margin-bottom:20px;">
+      <div class="eyebrow">¡Orden Finalizada!</div>
+      <h2 style="font-size:34px;">✉️ Correo enviado con éxito</h2>
+      <p class="muted">Tu boleto y código QR ya se encuentran disponibles en tu sección de Rewards.</p>
+    </div>
+    <div class="ticket ticket-pop" style="padding:26px;">
+      ${t.movie ? `<div style="display:flex;gap:16px;margin-bottom:16px;align-items:center;"><img src="${t.movie.poster}" style="width:70px;border-radius:8px;" onerror="onImgErr(this)"><h3 style="font-size:22px;color:var(--slate);">${t.movie.title}</h3></div>` : ''}
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <div class="display" style="font-size:22px;color:var(--blue);">STAR CINEMA MX</div>
+        <div style="display:flex;gap:8px;align-items:center;">${getStatusBadge(t.status)}<span class="badge">Folio: ${t.code}</span></div>
+      </div>
+      <div style="margin:16px 0;">
+        ${t.items.map(i=>`<div style="padding:6px 0;border-bottom:1px dashed var(--line);font-size:13.5px;">${i}</div>`).join('')}
+      </div>
+      <div class="ticket-divider"></div>
+      <div style="display:flex;gap:20px;align-items:center;">
+        <div class="qr"><img src="${qrImageUrl}" alt="QR" style="width:100%;height:100%;object-fit:contain;"></div>
+        <div style="flex:1;">
+          <div class="muted" style="font-size:12px;">Titular</div>
+          <div style="font-weight:800;">${esc(t.name)}</div>
+          <div class="muted" style="font-size:12px;margin-top:8px;">Total a Pagar en Taquilla</div>
+          <div class="price-tag">${money(t.total)}</div>
+        </div>
+      </div>
+    </div>
+    <div class="action-row">
+      <button class="btn btn-blue" onclick="goRewards()">Ver en sección Rewards</button>
+      <button class="btn btn-outline" onclick="goCartelera()">Volver a cartelera</button>
+    </div>
+  </div>`;
+}
+
+function goPronto(){ S.view='pronto'; render(); window.scrollTo(0,0); }
+function notifyPronto(){
+  const u = currentUser();
+  if(!u) toast('⚠️ Debes iniciar sesión en la sección Rewards para recibir notificaciones.');
+  else toast(`🔔 ¡Listo! Se te notificará al correo ${esc(u.email)} cuando "${PRONTO_MOVIE.title}" esté disponible.`);
+}
+
+function renderPronto(){
+  const m = PRONTO_MOVIE;
+  return `
+  <div class="container section">
+    <div class="eyebrow">Próximos Estrenos</div>
+    <h2 style="font-size:38px;margin-bottom:20px;">Pronto en Star Cinema</h2>
+    <div class="card pronto-card">
+      <img src="${m.poster}" style="border-radius:10px;" alt="${m.title}" onerror="onImgErr(this)">
+      <div>
+        <span class="badge">${m.lang}</span>
+        <h3 style="font-size:32px;margin:10px 0 8px;color:var(--slate);">${m.title}</h3>
+        <p class="muted" style="line-height:1.6;font-size:14.5px;">${m.synopsis}</p>
+        <div style="display:flex;gap:12px;margin-top:18px;flex-wrap:wrap;">
+          <a class="btn btn-outline" href="${m.trailer}" target="_blank" rel="noopener noreferrer">▶ Ver tráiler</a>
+          <button class="btn btn-gold" onclick="notifyPronto()">🔔 Notificarme</button>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function goRewards(){ S.view='rewards'; render(); window.scrollTo(0,0); }
+function isValidEmail(email){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email); }
+
+function registerUser(){
+  const name = document.getElementById('reg-name').value.trim();
+  const bday = document.getElementById('reg-bday').value;
+  const email = document.getElementById('reg-email').value.trim().toLowerCase();
+  const pass = document.getElementById('reg-pass').value;
+  const phone = document.getElementById('reg-phone').value.trim();
+  const gender = document.getElementById('reg-gender').value;
+
+  if(!name||!bday||!email||!pass||!phone||!gender){ toast('⚠️ Completa todos los campos'); return; }
+  if(!isValidEmail(email)){ toast('⚠️ Ingresa un correo válido'); return; }
+  if(pass.length < 6){ toast('⚠️ La contraseña debe tener al menos 6 caracteres'); return; }
+  if(S.accounts[email]){ toast('⚠️ Ya existe una cuenta con este correo'); return; }
+  
+  const dObj = new Date();
+  const yy = String(dObj.getFullYear()).slice(2);
+  const mm = String(dObj.getMonth()+1).padStart(2,'0');
+  const dd = String(dObj.getDate()).padStart(2,'0');
+  const initials = name.replace(/[^a-zA-Z]/g,'').slice(0,2).toUpperCase();
+  const accountNo = yy + mm + dd + initials + 'SC';
+
+  S.accounts[email] = { name, birthdate:bday, email, phone, gender, password: pass, accountNo, purchases: S.guestPurchases.slice(), points: 0, isStaff: false };
+  S.guestPurchases = [];
+  S.currentUserEmail = email;
+  toast('¡Tarjeta digital generada con éxito! 🌟');
+  render();
+}
+
+function loginUser(){
+  const email = document.getElementById('login-email').value.trim().toLowerCase();
+  const pass = document.getElementById('login-pass').value;
+
+  if(email === 'starcinemamx@gmail.com' && pass === 'Palomitas2026'){
+    S.currentUserEmail = email;
+    toast('🔐 Acceso de Personal autorizado');
+    render();
+    return;
+  }
+
+  const acc = S.accounts[email];
+  if(!acc || acc.isStaff || acc.password !== pass){ toast('⚠️ Cuenta o contraseña incorrecta'); return; }
+  S.currentUserEmail = email;
+  toast('Sesión iniciada correctamente');
+  render();
+}
+function logoutUser(){
+  stopScanner();
+  S.currentUserEmail=null; 
+  toast('Sesión cerrada'); 
+  render();
+}
+
+function toggleExpandTicket(code){
+  S.expandedTicketCode = S.expandedTicketCode === code ? null : code;
+  render();
+}
+
+function toggleTierModal(key){
+  S.expandedTierModal = S.expandedTierModal === key ? null : key;
+  render();
+}
+
+function updateTicketStatus(code, newStatus){
+  if(S.lastTicket && S.lastTicket.code.toLowerCase() === code.toLowerCase()) S.lastTicket.status = newStatus;
+  for(const accKey in S.accounts){
+    const found = S.accounts[accKey].purchases.find(p => p.code.toLowerCase() === code.toLowerCase());
+    if(found){ found.status = newStatus; break; }
+  }
+  const foundGuest = S.guestPurchases.find(p => p.code.toLowerCase() === code.toLowerCase());
+  if(foundGuest) foundGuest.status = newStatus;
+
+  toast(`Estatus actualizado a: ${newStatus.toUpperCase()}`);
+  render();
+}
+
+let html5QrCodeScannerInstance = null;
+function startScanner(){
+  S.scannerActive = true;
+  S.scanResult = null;
+  render();
+  setTimeout(() => {
+    try {
+      html5QrCodeScannerInstance = new Html5QrcodeScanner("reader", { fps: 10, qrbox: { width: 250, height: 250 } }, false);
+      html5QrCodeScannerInstance.render((text)=>{
+        S.scanResult = text;
+        toast(`¡Boleto escaneado con éxito!`);
+        stopScanner();
+      }, ()=>{});
+    } catch(e){ console.error(e); }
+  }, 150);
+}
+
+function stopScanner(){
+  if(html5QrCodeScannerInstance){
+    html5QrCodeScannerInstance.clear().catch(e => console.error(e));
+    html5QrCodeScannerInstance = null;
+  }
+  S.scannerActive = false;
+  render();
+}
+
+function renderTicketSummaryList(purchasesList){
+  if(!purchasesList.length) return `<p class="muted">Aún no hay compras registradas.</p>`;
+  return purchasesList.slice().reverse().map(t=>{
+    const isExpanded = S.expandedTicketCode === t.code;
+    const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(t.code)}`;
+    return `
+      <div style="padding:14px 0;border-bottom:1px dashed var(--line);cursor:pointer;" onclick="toggleExpandTicket('${t.code}')">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-weight:700;font-size:13.5px;color:var(--slate);">Folio: ${t.code}</span>
+          <div style="display:flex;gap:8px;align-items:center;">${getStatusBadge(t.status)}<span style="font-weight:700;font-size:12.5px;color:var(--muted);">${t.date} ▾</span></div>
+        </div>
+        ${isExpanded ? `
+          <div style="margin-top:14px;padding:14px;background:#fff;border-radius:10px;border:1px solid var(--line);" onclick="event.stopPropagation()">
+            ${t.movie ? `<div style="display:flex;gap:12px;margin-bottom:10px;align-items:center;"><img src="${t.movie.poster}" style="width:50px;border-radius:6px;" onerror="onImgErr(this)"><b style="color:var(--slate);">${t.movie.title}</b></div>` : ''}
+            <div style="font-size:13px;margin-bottom:10px;">${t.items.join(' | ')}</div>
+            <div style="text-align:center;"><img src="${qrImageUrl}" alt="QR" style="width:110px;height:110px;display:inline-block;background:#fff;padding:4px;border:1px solid var(--line);border-radius:6px;"></div>
+          </div>` : ''}
+      </div>`;
+  }).join('');
+}
+
+function renderRewards(){
+  const u = currentUser();
+  let foundScannedTicket = null;
+  if(S.scanResult){
+    if(S.lastTicket && S.lastTicket.code.toLowerCase() === S.scanResult.toLowerCase()) foundScannedTicket = S.lastTicket;
+    if(!foundScannedTicket){
+      for(const accKey in S.accounts){
+        const found = S.accounts[accKey].purchases.find(p => p.code.toLowerCase() === S.scanResult.toLowerCase());
+        if(found){ foundScannedTicket = found; break; }
+      }
+    }
+    if(!foundScannedTicket){
+      const foundGuest = S.guestPurchases.find(p => p.code.toLowerCase() === S.scanResult.toLowerCase());
+      if(foundGuest) foundScannedTicket = foundGuest;
+    }
+  }
+
+  return `
+  <div class="container section">
+    <div class="eyebrow">Star Rewards & Staff</div>
+    <h2 style="font-size:38px;margin-bottom:8px;">Programa de Lealtad y Acceso Personal</h2>
+    <p class="muted" style="max-width:560px;margin-bottom:30px;">Acumula puntos equivalentes a pesos o ingresa con tu cuenta de personal.</p>
+
+    ${u ? `
+      ${u.isStaff ? `
+        <div class="card" style="padding:26px;margin-bottom:30px;border:2px solid var(--blue);background:rgba(0,83,160,.03);">
+          <div class="eyebrow">Panel de Personal Autorizado</div>
+          <h3 style="font-size:28px;margin:6px 0 14px;color:var(--slate);">Validador de Boletos QR</h3>
+          ${!S.scannerActive ? `<button class="btn btn-blue" onclick="startScanner()">📷 Activar Cámara Escáner</button>` : `<button class="btn btn-outline" onclick="stopScanner()" style="margin-bottom:14px;">⏹ Detener Escáner</button>`}
+          <div id="reader" style="width:100%;max-width:400px;margin-top:14px;"></div>
+          ${S.scanResult ? `
+            <div style="margin-top:20px;padding:20px;background:#fff;border-radius:12px;border:2px solid var(--blue);">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                <div style="font-weight:800;color:var(--blue);font-size:15px;">✅ Boleto Escaneado</div>
+                <div>${foundScannedTicket ? getStatusBadge(foundScannedTicket.status) : ''}</div>
+              </div>
+              <div style="font-size:14px;margin-bottom:12px;">Folio: <b>${esc(S.scanResult)}</b></div>${foundScannedTicket ? `
+                <div style="border-top:1px solid var(--line);padding-top:12px;">
+                  <div style="font-size:13.5px;margin-bottom:6px;"><b>Titular:</b> ${esc(foundScannedTicket.name)}</div>
+                  <div style="font-size:13.5px;margin-bottom:12px;"><b>Total:</b> ${money(foundScannedTicket.total)}</div>
+                  <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                    <button class="btn btn-sm" style="background:#fff3cd;color:#856404;" onclick="updateTicketStatus('${foundScannedTicket.code}', 'por pagar')">🟡 Por pagar</button>
+                    <button class="btn btn-sm" style="background:#f8d7da;color:#721c24;" onclick="updateTicketStatus('${foundScannedTicket.code}', 'no pagado')">🔴 No pagado</button>
+                    <button class="btn btn-sm" style="background:#d4edda;color:#155724;" onclick="updateTicketStatus('${foundScannedTicket.code}', 'pagado')">🟢 Pagado</button>
+                  </div>
+                </div>` : `<p style="color:#dc3545;font-weight:700;">⚠️ Folio no encontrado.</p>`}
+            </div>` : ''}
+        </div>` : `
+        <div style="display:grid;grid-template-columns:1fr 1.3fr;gap:26px;align-items:start;">
+          <div class="member-card">
+            <div class="lvltag">${tierInfo(u.purchases.length).key} Level</div>
+            <div class="cname">${esc(u.name)}</div>
+            <div class="cmeta">Cuenta No. ${u.accountNo}</div>
+            <div class="pts">${u.points} pts</div>
+          </div>
+          <div class="card" style="padding:22px;">
+            <h3 style="font-size:20px;margin-bottom:14px;color:var(--slate);">Mis Compras y Boletos</h3>
+            ${renderTicketSummaryList(u.purchases)}
+          </div>
+        </div>`}
+    ` : `
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:26px;align-items:start;">
+        <div class="card" style="padding:26px;">
+          <div class="tab-row">
+            <button class="tab-btn ${S.authTab==='login'?'active':''}" onclick="S.authTab='login';render()">Iniciar sesión</button>
+            <button class="tab-btn ${S.authTab==='register'?'active':''}" onclick="S.authTab='register';render()">Crear cuenta</button>
+          </div>
+          ${S.authTab==='login' ? `
+            <div class="field-label">Correo electrónico</div>
+            <input type="email" id="login-email" placeholder="tucorreo@ejemplo.com">
+            <div class="field-label" style="margin-top:12px;">Contraseña</div>
+            <input type="password" id="login-pass" placeholder="••••••••">
+            <button class="btn btn-blue btn-full" style="margin-top:16px;" onclick="loginUser()">Iniciar sesión</button>
+          ` : `
+            <div class="field-label">Nombre completo</div>
+            <input type="text" id="reg-name" placeholder="Tu nombre">
+            <div class="field-label">Fecha de nacimiento</div>
+            <input type="date" id="reg-bday">
+            <div class="field-label">Correo electrónico</div>
+            <input type="email" id="reg-email" placeholder="tucorreo@ejemplo.com">
+            <div class="field-label">Contraseña</div>
+            <input type="password" id="reg-pass" placeholder="Mínimo 6 caracteres">
+            <div class="field-label">Número telefónico</div>
+            <input type="text" id="reg-phone" placeholder="5512345678">
+            <div class="field-label">Género</div>
+            <select id="reg-gender"><option value="Hombre">Hombre</option><option value="Mujer">Mujer</option></select>
+            <button class="btn btn-gold btn-full" style="margin-top:16px;" onclick="registerUser()">Generar Tarjeta Digital</button>
+          `}
+        </div>
+        <div class="card" style="padding:22px;">
+          <h3 style="font-size:20px;margin-bottom:10px;color:var(--slate);">Mis Compras Previas (Invitado)</h3>
+          ${renderTicketSummaryList(S.guestPurchases)}
+        </div>
+      </div>
+    `}
+
+    <h3 style="font-size:26px;margin:44px 0 6px;color:var(--slate);">Niveles de Membresía</h3>
+    <div class="tier-grid">
+      ${TIER_DEFS.map((t,i)=>{
+        const open = S.expandedTierModal === t.key;
+        return `
+        <div class="card tier-card ${t.key.toLowerCase()}" style="--i:${i}" onclick="toggleTierModal('${t.key}')">
+          <h3>${t.key} Level</h3>
+          <div class="muted" style="font-size:12.5px;">De ${t.min} a${t.max} compras ${open?'▲':'▼'}</div>${open ? `<ul>${t.perks.map(p=>`<li>${p}</li>`).join('')}</ul>` : `<p class="muted" style="font-size:12px;margin-top:8px;">Haz clic para ver beneficios</p>`}
+        </div>`;
+      }).join('')}
+    </div>
+  </div>`;
+}
+
+function render(){
+  let content = '';
+  if(S.view==='cartelera') content = renderCartelera();
+  else if(S.view==='detalle') content = renderDetalle();
+  else if(S.view==='dulceria') content = renderDulceria();
+  else if(S.view==='pago') content = renderPago();
+  else if(S.view==='ticket') content = renderTicket();
+  else if(S.view==='pronto') content = renderPronto();
+  else if(S.view==='rewards') content = renderRewards();
+
+  $app.innerHTML = `
+    ${renderNav()}
+    <main>${content}</main>
+    <footer>
+      <div class="container" style="text-align:center;color:var(--muted);font-size:13px;">
+        © Star Cinema MX — Orgullosamente una compañía mexicana.
+      </div>
+    </footer>
+  `;
+}
+
+render();
+</script>
+</body>
+</html>
